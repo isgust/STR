@@ -61,12 +61,58 @@ O sistema pode ser dividido em várias Tasks executadas concorrentemente:
 
 ---
 
-## ⚙️ Escalonamento (Scheduling)
+## ⚙️ Algoritmo de Escalonamento: O Go Scheduler (M:N Work-Stealing)
 
-O servidor foi construído em **Go**, cujo runtime traz um próprio algoritmo de escalonamento embutido:
-- **Escalonador M:N (Work-Stealing):** O escalonador do Go mapeia um número `M` de Goroutines (nossas Tasks) para um número `N` de Threads do Sistema Operacional. 
-- Ele atua de forma **Preemptiva / Cooperativa**, trocando o contexto das tarefas sempre que há uma operação de I/O (como ler dados do WebSocket) ou concorrência.
-- Embora não seja um escalonamento puramente voltado a Tempo Real Rígido (como RMS ou EDF em RTOS), ele garante concorrência maciça e baixa latência de resposta, o suficiente para o modelo *Soft Real-Time* da aplicação.
+O servidor foi construído em **Go**, cujo runtime traz um próprio algoritmo de escalonamento embutido. Diferente de linguagens onde 1 Tarefa = 1 Thread do SO (modelo 1:1), o Go usa o modelo **M:N**, onde **M** Goroutines são mapeadas para **N** Threads do Sistema Operacional.
+
+### O Modelo G-P-M
+Para entender o fluxo, precisamos conhecer as três entidades do escalonador do Go:
+- **G (Goroutine):** A tarefa em si (ex: nosso `readPump` ou o temporizador da bomba).
+- **M (Machine / Thread do SO):** A thread real do Sistema Operacional que executa o código na CPU.
+- **P (Processor / Processador Lógico):** O contexto de execução. Ele possui uma fila local de Goroutines prontas para executar. O número de 'P's geralmente é igual ao número de núcleos do seu processador.
+
+### Fluxo de Execução e Preempção (I/O Bloqueante)
+1. Quando uma Goroutine inicia (ex: `go client.readPump()`), ela é colocada na fila local de um Processador Lógico (**P**).
+2. A Thread do SO (**M**) atrelada a esse **P** pega a Goroutine da fila e a executa.
+3. **Preempção Cooperativa por I/O:** O que acontece quando o `readPump` fica esperando uma mensagem da rede (I/O bloqueante)? 
+   - A Thread **M** que estava executando essa Goroutine fica bloqueada no Sistema Operacional.
+   - O Escalonador do Go percebe isso! Ele **desvincula o P dessa M bloqueada** e atrela o P a uma **nova M** livre.
+   - O Processador Lógico **P** continua executando as outras Goroutines da sua fila local normalmente, sem travar o servidor.
+4. Quando a mensagem da rede chega, a Goroutine acorda e volta para a fila de prontos.
+
+### O Algoritmo de Work-Stealing (Roubo de Trabalho)
+E se o Processador Lógico 1 (P1) terminar todas as tarefas da sua fila, mas o P2 ainda tiver 100 Goroutines aguardando?
+Aqui entra o **Work-Stealing**:
+- O P1 não fica ocioso. Ele olha para a fila do P2 e **"rouba" (steals)** metade das Goroutines de P2.
+- Isso balanceia a carga dinamicamente, garantindo que nenhum núcleo fique sem trabalho.
+
+### Diagrama de Fluxo (G-P-M)
+```mermaid
+graph TD
+    subgraph CPU_SO [Sistema Operacional]
+        M1(Thread - M1)
+        M2(Thread - M2)
+        M3(Thread Bloqueada - M3)
+    end
+
+    subgraph Go_Runtime [Runtime do Go - Escalonador]
+        P1[Processador Lógico P1]
+        P2[Processador Lógico P2]
+        
+        Q1[(Fila Local P1\n- G1, G2, G3)]
+        Q2[(Fila Local P2\n- G4)]
+        
+        P1 --- Q1
+        P2 --- Q2
+        
+        P1 --- M1
+        P2 --- M2
+        
+        G_IO((Goroutine G5\nEsperando Rede / IO)) --- M3
+    end
+    
+    Q1 -. "Work-Stealing\n(P2 rouba G3 de P1)" .-> P2
+```
 
 ---
 

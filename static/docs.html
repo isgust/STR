@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentação - Super Latency Bomber (STR)</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true, theme: 'dark', fontFamily: 'Outfit'});</script>
     <style>
         :root {
             --bg-main: #0b0f19;
@@ -245,11 +247,57 @@
         </section>
 
         <section>
-            <h2>Algoritmo de Escalonamento</h2>
+            <h2>Algoritmo de Escalonamento: O Go Scheduler</h2>
             <div class="card">
                 <p>Como essas Tasks recebem tempo de processamento da CPU? Utilizamos o poder do próprio Runtime do <strong>Golang</strong>.</p>
                 <p>O Go implementa um escalonador embutido <span class="badge" style="background: rgba(99,102,241,0.2); color: var(--primary);">M:N Work-Stealing</span>. Ele mapeia logicamente <code>M</code> goroutines em <code>N</code> threads do Sistema Operacional.</p>
-                <p>Esse escalonamento é <strong>preemptivo cooperativo</strong>, o que significa que se uma goroutine (como a de <i>readPump</i>) travar esperando os dados da rede (I/O bloqueante), o escalonador tira a CPU dela e cede para outra tarefa (por exemplo, a goroutine do Timer ou do P2). Isso garante respostas em baixíssima latência para um sistema Soft Real-Time, sem precisar de algoritmos rígidos baseados em prioridade (como Rate Monotonic Scheduling).</p>
+                
+                <h3 style="color: var(--secondary); margin-top: 2rem;">O Modelo G-P-M</h3>
+                <ul class="step-list">
+                    <li><span class="highlight-text">G (Goroutine):</span> A tarefa / task em execução.</li>
+                    <li><span class="highlight-text">M (Machine):</span> Thread física do Sistema Operacional rodando na CPU.</li>
+                    <li><span class="highlight-text">P (Processor):</span> Processador lógico do Go. Ele mantém uma Fila Local de Goroutines prontas.</li>
+                </ul>
+
+                <h3 style="color: var(--secondary); margin-top: 2rem;">Preempção Cooperativa por I/O</h3>
+                <p>No nosso jogo, <i>readPump</i> fica esperando na rede (I/O bloqueante). Quando a Thread do SO (<strong>M</strong>) trava esperando os dados de I/O, o Escalonador age rapidamente: ele desvincula o <strong>P</strong> dessa thread travada e entrega o <strong>P</strong> para uma nova Thread <strong>M</strong> livre. Assim, as outras Goroutines na fila daquele P continuam rodando fluidamente!</p>
+
+                <h3 style="color: var(--secondary); margin-top: 2rem;">Work-Stealing (Roubo de Trabalho)</h3>
+                <p>Se o processador <strong>P1</strong> zerar sua fila local enquanto <strong>P2</strong> está sobrecarregado, o algoritmo de Work-Stealing entra em ação: <strong>P1</strong> "rouba" metade do trabalho da fila de <strong>P2</strong> para si, balanceando a carga em tempo real.</p>
+                
+                <div style="margin-top: 2rem; background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 12px; text-align: center;">
+<pre class="mermaid">
+graph TD
+    subgraph "Sistema Operacional (OS)"
+        M1(Thread M1)
+        M2(Thread M2)
+        M3(Thread Bloqueada M3)
+    end
+
+    subgraph "Go Runtime (Escalonador)"
+        P1[Processador Lógico P1]
+        P2[Processador Lógico P2]
+        
+        Q1[(Fila Local P1\n- G1, G2, G3)]
+        Q2[(Fila Local P2\n- G4)]
+        
+        P1 --- Q1
+        P2 --- Q2
+        
+        P1 --- M1
+        P2 --- M2
+        
+        G_IO((Goroutine G5\nEsperando Rede)) --- M3
+    end
+    
+    Q1 -. "Work-Stealing\n(P2 rouba G3 de P1)" .-> P2
+    style M1 fill:#3b82f6,stroke:#1d4ed8
+    style M2 fill:#3b82f6,stroke:#1d4ed8
+    style M3 fill:#ef4444,stroke:#b91c1c
+    style P1 fill:#8b5cf6,stroke:#6d28d9
+    style P2 fill:#8b5cf6,stroke:#6d28d9
+</pre>
+                </div>
             </div>
         </section>
 
