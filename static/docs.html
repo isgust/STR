@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentação - Super Latency Bomber</title>
+    <title>Documentação - Super Latency Bomber (STR)</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,6 +14,7 @@
             --text-light: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #10b981;
+            --warning: #f59e0b;
         }
 
         body {
@@ -104,10 +105,7 @@
             position: relative;
         }
 
-        .code-block code {
-            color: #c9d1d9;
-        }
-
+        .code-block code { color: #c9d1d9; }
         .keyword { color: #ff7b72; }
         .function { color: #d2a8ff; }
         .string { color: #a5d6ff; }
@@ -170,6 +168,7 @@
         }
         
         .badge {
+            display: inline-block;
             background: rgba(16, 185, 129, 0.2);
             color: var(--accent);
             padding: 4px 10px;
@@ -180,94 +179,118 @@
             vertical-align: middle;
             margin-left: 10px;
         }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Super Latency Bomber</h1>
-            <p>Um estudo interativo sobre conexões WebSocket, tempo real e como a latência afeta jogos online.</p>
+            <h1>Sistemas de Tempo Real (STR)</h1>
+            <p>Super Latency Bomber: Um estudo prático sobre Concorrência, Escalonamento, Deadlines e Compensação de Lag em jogos online.</p>
             <a href="/" class="btn-play">Jogar Agora 🎮</a>
         </header>
 
         <section>
-            <h2>Como Rodar o Projeto</h2>
+            <h2>Analogias e o Conceito de Tempo Real</h2>
             <div class="card">
-                <p>O projeto é construído em <strong>Go</strong> (Golang) com uma interface em HTML, CSS e JS puros. Para executá-lo em sua máquina local, siga os passos:</p>
+                <p>Neste projeto, modelamos situações do mundo real através da mecânica do jogo. Abaixo vemos como cada peça se encaixa na teoria de Sistemas de Tempo Real:</p>
                 
-                <ul class="step-list">
-                    <li>Certifique-se de ter o <span class="highlight-text">Go (versão 1.18+)</span> instalado na sua máquina.</li>
-                    <li>Abra o terminal na raiz do projeto (pasta onde estão <code>main.go</code> e <code>game.go</code>).</li>
-                    <li>Execute o comando abaixo para iniciar o servidor:
-                        <div class="code-block">
-                            <code><span class="keyword">go run</span> .</code>
-                        </div>
-                    </li>
-                    <li>Abra seu navegador favorito e acesse <span class="highlight-text">http://localhost:8080</span>.</li>
-                </ul>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--secondary);">💣 A Bomba = O Deadline</h3>
+                        <p>A explosão atua como o <strong>Deadline Absoluto</strong>. As tarefas devem terminar antes desse limite. Perder esse prazo gera um <strong>Deadline Miss</strong>, causando a derrota do jogador.</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--primary);">🚦 Soft Real-Time</h3>
+                        <p>Este sistema é classificado como <strong>Tempo Real Frouxo (Soft)</strong>. A falha no deadline não causa falha crítica ou danos catastróficos ao sistema (ao contrário do freio de um carro), gerando apenas uma degradação de serviço aceitável.</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3 style="color: var(--accent);">🏃 Os 3 Jogadores = Tarefas (Tasks)</h3>
+                    <p>Os jogadores representam <strong>Tasks concorrentes</strong> com atrasos de rede variáveis:</p>
+                    <ul style="color: var(--text-muted);">
+                        <li><strong>P1 (20ms):</strong> Uma Task rápida, com tempo de comunicação previsível.</li>
+                        <li><strong>P2 (150ms) e P3 (400ms):</strong> Tasks que sofrem com jitter e atrasos de propagação severos, provando a necessidade de tolerância a falhas temporais e compensação por parte do servidor.</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
         <section>
-            <h2>O Conceito de Tempo Real e Latência</h2>
-            
-            <p>Quando jogamos na internet, a informação viaja do nosso computador até o servidor do jogo. Esse tempo de viagem é conhecido como <strong>Latência</strong> ou <strong>Ping</strong>.</p>
-            
+            <h2>Concorrência e Tasks (Tarefas)</h2>
             <div class="card">
-                <h3 style="margin-top:0; color: var(--text-light);">O Problema <span class="badge" style="background: rgba(236,72,153,0.2); color: var(--secondary);">Sem Compensação</span></h3>
-                <p>Se um jogador tem <span class="highlight-text">400ms</span> de latência, qualquer ação que ele fizer levará quase meio segundo para chegar ao servidor. No <strong>Super Latency Bomber</strong>, o objetivo é apertar o botão exatamente no tempo limite. Se o servidor ignorar a latência, o jogador com internet mais lenta será penalizado injustamente, pois seu clique sempre chegará atrasado.</p>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-top:0; color: var(--text-light);">A Solução <span class="badge">Lag Compensation</span></h3>
-                <p>Para criar um ambiente competitivo justo, os servidores modernos utilizam a <strong>Compensação de Lag</strong> (Lag Compensation). O servidor usa o Ping do jogador para calcular o exato momento em que a ação ocorreu na tela do cliente, essencialmente "voltando no tempo".</p>
+                <p>Onde a concorrência acontece de verdade no sistema? Em jogos multiplayer, conexões simultâneas precisam ser tratadas juntas.</p>
                 
-                <p>Veja no código abaixo como implementamos isso na função <code>handlePress</code> em <code>game.go</code>:</p>
+                <p><span class="highlight-text">No Servidor (Go):</span> O modelo de <strong>Goroutines</strong> é utilizado extensivamente. Em vez de bloquear o sistema para esperar a mensagem de um cliente, dividimos o trabalho em várias <strong>Tasks Assíncronas</strong>:</p>
+                <ul class="step-list">
+                    <li><span class="highlight-text">readPump:</span> Task de Leitura (Event-driven). Fica esperando entradas de rede a todo instante, lendo os comandos dos jogadores (ações de pressionar).</li>
+                    <li><span class="highlight-text">writePump:</span> Task de Escrita. Seu único trabalho é despachar mensagens para a rede de volta aos clientes via <i>Channels</i>.</li>
+                    <li><span class="highlight-text">Game.Run:</span> Task de Broadcast / Loop do Servidor. Orquestra a central de eventos do jogo sem causar bloqueios (I/O).</li>
+                    <li><span class="highlight-text">Timer Task:</span> Uma tarefa de interrupção (<code>time.AfterFunc</code>) que executa a "explosão" exatamente após decorrido o <i>Delay</i>.</li>
+                </ul>
+
+                <p>Para evitar corrupção de memória quando múltiplos jogadores enviam a resposta simultaneamente (<strong>Race Conditions</strong>), protegemos o estado da partida com Exclusão Mútua através de <span class="highlight-text"><code>sync.Mutex</code> (g.mu.Lock / Unlock)</span>.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Algoritmo de Escalonamento</h2>
+            <div class="card">
+                <p>Como essas Tasks recebem tempo de processamento da CPU? Utilizamos o poder do próprio Runtime do <strong>Golang</strong>.</p>
+                <p>O Go implementa um escalonador embutido <span class="badge" style="background: rgba(99,102,241,0.2); color: var(--primary);">M:N Work-Stealing</span>. Ele mapeia logicamente <code>M</code> goroutines em <code>N</code> threads do Sistema Operacional.</p>
+                <p>Esse escalonamento é <strong>preemptivo cooperativo</strong>, o que significa que se uma goroutine (como a de <i>readPump</i>) travar esperando os dados da rede (I/O bloqueante), o escalonador tira a CPU dela e cede para outra tarefa (por exemplo, a goroutine do Timer ou do P2). Isso garante respostas em baixíssima latência para um sistema Soft Real-Time, sem precisar de algoritmos rígidos baseados em prioridade (como Rate Monotonic Scheduling).</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Lag Compensation (Compensação de Atraso)</h2>
+            
+            <p>Se o servidor não compensasse a latência, o P3 (com 400ms) sempre perderia o prazo mesmo agindo na hora certa na tela dele. A compensação resolve a "injustiça do Deadline".</p>
+            
+            <div class="card">
+                <p>No código abaixo (em <code>game.go</code>), o servidor "volta no tempo" deduzindo o atraso:</p>
                 
                 <div class="code-block">
 <pre><code><span class="keyword">func</span> <span class="function">(g *Game) handlePress</span>(player <span class="keyword">int</span>, simulatedLatency <span class="keyword">int64</span>) {
-    <span class="comment">// Atraso artificial para simular a rede (Latência)</span>
+    <span class="comment">// Atraso de simulação na rede</span>
     time.Sleep(time.Duration(simulatedLatency) * time.Millisecond)
 
     serverReceiveTime := time.Now().UnixMilli()
     <span class="keyword">var</span> eventTime <span class="keyword">int64</span>
 
     <span class="keyword">if</span> g.lagComp {
-        <span class="comment">// Compensação de Lag ATIVADA</span>
-        <span class="comment">// O servidor deduz a latência para saber quando ocorreu o clique real</span>
+        <span class="comment">// VOLTA NO TEMPO: Subtrai a latência (Ping) do momento em 
+        // que o pacote chegou. Encontra a hora exata da ação real!</span>
         eventTime = serverReceiveTime - simulatedLatency
     } <span class="keyword">else</span> {
-        <span class="comment">// Compensação de Lag DESATIVADA</span>
-        <span class="comment">// O servidor julga com base na hora de chegada. Injusto!</span>
+        <span class="comment">// Injusto: Assumimos que o cliente apertou agora.</span>
         eventTime = serverReceiveTime
     }
 
-    <span class="comment">// Validação do clique em relação ao momento da explosão</span>
+    <span class="comment">// Avalia se cumpriu o Deadline (Prazo da explosão)</span>
     <span class="keyword">if</span> eventTime >= g.explosionTime {
-        status = <span class="string">"DEAD"</span>
+        status = <span class="string">"DEAD"</span>  <span class="comment">// Deadline Miss!</span>
     } <span class="keyword">else</span> {
-        status = <span class="string">"ALIVE"</span>
+        status = <span class="string">"ALIVE"</span> <span class="comment">// Deadline Cumprido!</span>
     }
 }</code></pre>
                 </div>
             </div>
         </section>
-
-        <section>
-            <h2>Arquitetura do Projeto</h2>
-            <div class="card">
-                <p>O sistema foi construído pensando na simplicidade e eficiência dos WebSockets.</p>
-                <ul class="step-list" style="margin-top: 20px;">
-                    <li><span class="highlight-text">main.go:</span> Responsável por inicializar o servidor HTTP e fazer o Upgrade das conexões para WebSocket.</li>
-                    <li><span class="highlight-text">game.go:</span> Mantém a <em>Game Loop</em> e as variáveis de estado do servidor, recebendo as ações dos jogadores e emitindo o estado de volta para todos os clientes em tempo real (Broadcasting).</li>
-                    <li><span class="highlight-text">main.js:</span> Envia mensagens JSON curtas via <code>ws.send()</code> e renderiza o relógio a 60FPS usando <code>requestAnimationFrame</code>.</li>
-                </ul>
-            </div>
-        </section>
         
         <footer style="text-align: center; margin-top: 4rem; color: var(--text-muted); font-size: 0.9rem;">
-            &copy; 2026 STR Class UFMA. Documentação gerada para o Super Latency Bomber.
+            &copy; 2026 STR Class UFMA. Documentação focada nos preceitos de Sistemas de Tempo Real.
         </footer>
     </div>
 
