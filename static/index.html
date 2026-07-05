@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Latency Bomber</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- TELA INICIAL -->
+    <div id="start-screen" class="screen active">
+        <div class="title-container">
+            <h1>SUPER</h1>
+            <h1 class="bomber">LATENCY</h1>
+            <h1 class="man">BOMBER</h1>
+            <h1 class="five">5</h1>
+        </div>
+
+        <div class="menu">
+            <div class="push-start blinking">PUSH START BUTTON (SPACE)</div>
+            <div class="options">
+                <label>
+                    <input type="checkbox" id="lag-comp-toggle"> 
+                    LAG COMPENSATION
+                </label>
+            </div>
+            <div class="options" style="margin-top: 20px;">
+                <a href="docs.html" target="_blank" style="color: var(--highlight); text-decoration: none; font-size: 0.8rem; border-bottom: 1px dashed var(--highlight); cursor: pointer;">📖 LER DOCUMENTAÇÃO</a>
+            </div>
+            <div class="copyright">© 2026 STR CLASS UFMA</div>
+        </div>
+    </div>
+
+    <!-- TELA DE JOGO -->
+    <div id="game-screen" class="screen">
+        <div class="header">
+            <div class="game-options">
+                <label>
+                    <input type="checkbox" id="show-ping-toggle"> Mostrar Latências Ocultas
+                </label>
+            </div>
+            <div id="timer">--:--</div>
+            <div class="status-bar" id="status-text">WAITING...</div>
+        </div>
+
+        <div class="arena">
+            <div class="bomb-container">
+                <div id="bomb" class="bomb idle">💣</div>
+            </div>
+            
+            <div class="players">
+                <!-- Jogador 1 -->
+                <div class="player p1" id="p1">
+                    <div class="sprite">🧑‍🚀</div>
+                    <div class="name">P1 (Tecla A)</div>
+                    <div class="ping">
+                        Ping: <input type="number" id="p1-ping" value="20" min="0">ms
+                    </div>
+                    <div class="result" id="p1-result">--</div>
+                </div>
+
+                <!-- Jogador 2 -->
+                <div class="player p2" id="p2">
+                    <div class="sprite">🥷</div>
+                    <div class="name">P2 (Tecla G)</div>
+                    <div class="ping">
+                        Ping: <input type="number" id="p2-ping" value="150" min="0">ms
+                    </div>
+                    <div class="result" id="p2-result">--</div>
+                </div>
+
+                <!-- Jogador 3 -->
+                <div class="player p3" id="p3">
+                    <div class="sprite">🧙</div>
+                    <div class="name">P3 (Tecla L)</div>
+                    <div class="ping">
+                        Ping: <input type="number" id="p3-ping" value="400" min="0">ms
+                    </div>
+                    <div class="result" id="p3-result">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-hint">
+            Aperte a tecla correspondente quando a bomba explodir (cronômetro = 0)!<br>
+            Aperte ESPAÇO para iniciar.
+        </div>
+
+        <div id="ranking-container" style="display: none;">
+            <h3>🏆 RANKING 🏆</h3>
+            <div id="ranking-list"></div>
+            <button id="restart-btn" class="btn">REINICIAR JOGO</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

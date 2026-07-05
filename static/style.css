@@ -1,0 +1,239 @@
+:root {
+    --bg-dark: #000022;
+    --text-main: #f5f5f5;
+    --highlight: #ffcc00;
+    --red: #ff3333;
+    --green: #33cc33;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* START SCREEN */
+#start-screen {
+    justify-content: space-around;
+    background: url('data:image/svg+xml;utf8,<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="%23ffffff22"/></svg>') repeat;
+}
+
+.title-container h1 {
+    font-size: 3rem;
+    margin: 10px 0;
+    text-shadow: 4px 4px 0px #000, 6px 6px 0px #555;
+    transform: skew(-10deg);
+}
+.title-container .bomber { color: #ff6600; font-size: 4rem;}
+.title-container .man { color: #ffcc00; font-size: 4rem;}
+.title-container .five { color: var(--green); font-size: 6rem; position: absolute; right: 10%; top: 20%; transform: skew(-15deg); text-shadow: 6px 6px 0px #000, 8px 8px 0px #fff;}
+
+.blinking {
+    animation: blink 1s step-end infinite;
+    color: var(--highlight);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.options {
+    margin-top: 30px;
+    font-size: 0.8rem;
+}
+.options input {
+    cursor: pointer;
+}
+
+.copyright {
+    font-size: 0.6rem;
+    margin-top: 50px;
+    color: #888;
+}
+
+/* GAME SCREEN */
+#game-screen {
+    justify-content: space-between;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+#timer {
+    font-size: 3rem;
+    color: var(--highlight);
+    margin-bottom: 10px;
+}
+
+.status-bar {
+    font-size: 1.2rem;
+}
+
+.arena {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.bomb-container {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.bomb {
+    font-size: 5rem;
+    transition: transform 0.1s;
+}
+
+.bomb.countdown {
+    animation: pulse 0.5s infinite;
+}
+
+.bomb.exploded {
+    font-size: 8rem;
+    animation: explode 0.5s ease-out forwards;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 5px red); }
+    50% { transform: scale(1.2); filter: drop-shadow(0 0 20px red); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 5px red); }
+}
+
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; content: "💥"; }
+    50% { transform: scale(2); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+.players {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.player {
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid #555;
+    padding: 20px;
+    width: 30%;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.player.p1 { border-color: #3399ff; }
+.player.p2 { border-color: #ff3333; }
+.player.p3 { border-color: #33cc33; }
+
+.player .sprite {
+    font-size: 3rem;
+}
+
+.player .name {
+    font-size: 0.7rem;
+}
+
+.player .ping {
+    font-size: 0.6rem;
+    color: #aaa;
+}
+
+.player .ping input {
+    width: 50px;
+    background: #000;
+    color: #fff;
+    border: 1px solid #555;
+    font-family: inherit;
+    text-align: right;
+}
+
+.player .result {
+    font-size: 1rem;
+    min-height: 24px;
+}
+.result.good { color: var(--green); }
+.result.bad { color: var(--red); }
+.result.late { color: #888; }
+
+.controls-hint {
+    font-size: 0.6rem;
+    color: #888;
+    line-height: 1.5;
+    margin-top: 20px;
+}
+
+.ping {
+    display: none;
+}
+.show-pings .ping {
+    display: block;
+}
+.game-options {
+    font-size: 0.6rem;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+#ranking-container {
+    margin-top: 30px;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid var(--highlight);
+    padding: 20px;
+    border-radius: 10px;
+}
+#ranking-list {
+    margin: 20px 0;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    text-align: left;
+}
+.btn {
+    background: var(--highlight);
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+.btn:hover {
+    background: #fff;
+}
+

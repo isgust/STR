@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - Super Latency Bomber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: rgba(22, 27, 40, 0.7);
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .code-block code {
+            color: #c9d1d9;
+        }
+
+        .keyword { color: #ff7b72; }
+        .function { color: #d2a8ff; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; font-style: italic; }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: my-counter;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .step-list li::before {
+            counter-increment: my-counter;
+            content: counter(my-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn-play {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .highlight-text {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        
+        .badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Super Latency Bomber</h1>
+            <p>Um estudo interativo sobre conexões WebSocket, tempo real e como a latência afeta jogos online.</p>
+            <a href="/" class="btn-play">Jogar Agora 🎮</a>
+        </header>
+
+        <section>
+            <h2>Como Rodar o Projeto</h2>
+            <div class="card">
+                <p>O projeto é construído em <strong>Go</strong> (Golang) com uma interface em HTML, CSS e JS puros. Para executá-lo em sua máquina local, siga os passos:</p>
+                
+                <ul class="step-list">
+                    <li>Certifique-se de ter o <span class="highlight-text">Go (versão 1.18+)</span> instalado na sua máquina.</li>
+                    <li>Abra o terminal na raiz do projeto (pasta onde estão <code>main.go</code> e <code>game.go</code>).</li>
+                    <li>Execute o comando abaixo para iniciar o servidor:
+                        <div class="code-block">
+                            <code><span class="keyword">go run</span> .</code>
+                        </div>
+                    </li>
+                    <li>Abra seu navegador favorito e acesse <span class="highlight-text">http://localhost:8080</span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>O Conceito de Tempo Real e Latência</h2>
+            
+            <p>Quando jogamos na internet, a informação viaja do nosso computador até o servidor do jogo. Esse tempo de viagem é conhecido como <strong>Latência</strong> ou <strong>Ping</strong>.</p>
+            
+            <div class="card">
+                <h3 style="margin-top:0; color: var(--text-light);">O Problema <span class="badge" style="background: rgba(236,72,153,0.2); color: var(--secondary);">Sem Compensação</span></h3>
+                <p>Se um jogador tem <span class="highlight-text">400ms</span> de latência, qualquer ação que ele fizer levará quase meio segundo para chegar ao servidor. No <strong>Super Latency Bomber</strong>, o objetivo é apertar o botão exatamente no tempo limite. Se o servidor ignorar a latência, o jogador com internet mais lenta será penalizado injustamente, pois seu clique sempre chegará atrasado.</p>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0; color: var(--text-light);">A Solução <span class="badge">Lag Compensation</span></h3>
+                <p>Para criar um ambiente competitivo justo, os servidores modernos utilizam a <strong>Compensação de Lag</strong> (Lag Compensation). O servidor usa o Ping do jogador para calcular o exato momento em que a ação ocorreu na tela do cliente, essencialmente "voltando no tempo".</p>
+                
+                <p>Veja no código abaixo como implementamos isso na função <code>handlePress</code> em <code>game.go</code>:</p>
+                
+                <div class="code-block">
+<pre><code><span class="keyword">func</span> <span class="function">(g *Game) handlePress</span>(player <span class="keyword">int</span>, simulatedLatency <span class="keyword">int64</span>) {
+    <span class="comment">// Atraso artificial para simular a rede (Latência)</span>
+    time.Sleep(time.Duration(simulatedLatency) * time.Millisecond)
+
+    serverReceiveTime := time.Now().UnixMilli()
+    <span class="keyword">var</span> eventTime <span class="keyword">int64</span>
+
+    <span class="keyword">if</span> g.lagComp {
+        <span class="comment">// Compensação de Lag ATIVADA</span>
+        <span class="comment">// O servidor deduz a latência para saber quando ocorreu o clique real</span>
+        eventTime = serverReceiveTime - simulatedLatency
+    } <span class="keyword">else</span> {
+        <span class="comment">// Compensação de Lag DESATIVADA</span>
+        <span class="comment">// O servidor julga com base na hora de chegada. Injusto!</span>
+        eventTime = serverReceiveTime
+    }
+
+    <span class="comment">// Validação do clique em relação ao momento da explosão</span>
+    <span class="keyword">if</span> eventTime >= g.explosionTime {
+        status = <span class="string">"DEAD"</span>
+    } <span class="keyword">else</span> {
+        status = <span class="string">"ALIVE"</span>
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Arquitetura do Projeto</h2>
+            <div class="card">
+                <p>O sistema foi construído pensando na simplicidade e eficiência dos WebSockets.</p>
+                <ul class="step-list" style="margin-top: 20px;">
+                    <li><span class="highlight-text">main.go:</span> Responsável por inicializar o servidor HTTP e fazer o Upgrade das conexões para WebSocket.</li>
+                    <li><span class="highlight-text">game.go:</span> Mantém a <em>Game Loop</em> e as variáveis de estado do servidor, recebendo as ações dos jogadores e emitindo o estado de volta para todos os clientes em tempo real (Broadcasting).</li>
+                    <li><span class="highlight-text">main.js:</span> Envia mensagens JSON curtas via <code>ws.send()</code> e renderiza o relógio a 60FPS usando <code>requestAnimationFrame</code>.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <footer style="text-align: center; margin-top: 4rem; color: var(--text-muted); font-size: 0.9rem;">
+            &copy; 2026 STR Class UFMA. Documentação gerada para o Super Latency Bomber.
+        </footer>
+    </div>
+
+</body>
+</html>
