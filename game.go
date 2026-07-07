@@ -34,9 +34,10 @@ const (
 )
 
 type ResultDetail struct {
-	Diff      int64  `json:"diff"`
-	EventTime int64  `json:"eventTime"`
-	Status    string `json:"status"`
+	Diff       int64  `json:"diff"`
+	EventTime  int64  `json:"eventTime"`
+	ClientDiff int64  `json:"clientDiff"`
+	Status     string `json:"status"`
 }
 
 type Game struct {
@@ -123,6 +124,9 @@ func (g *Game) handleStart(lagComp bool) {
 		g.mu.Unlock()
 		return
 	}
+	if g.timer != nil {
+		g.timer.Stop()
+	}
 	g.state = StateCountdown
 	g.lagComp = lagComp
 	g.results = make(map[int]ResultDetail)
@@ -158,7 +162,7 @@ func (g *Game) handleStart(lagComp bool) {
 	g.broadcastState()
 }
 
-func (g *Game) handlePress(player int, simulatedLatency int64) {
+func (g *Game) handlePress(player int, simulatedLatency int64, clientTime int64) {
 	// Atraso artificial para simular a rede (Latência)
 	time.Sleep(time.Duration(simulatedLatency) * time.Millisecond)
 
@@ -194,10 +198,12 @@ func (g *Game) handlePress(player int, simulatedLatency int64) {
 	}
 
 	diff := eventTime - g.explosionTime
+	clientDiff := clientTime - g.explosionTime
 	g.results[player] = ResultDetail{
-		Diff:      diff,
-		EventTime: eventTime,
-		Status:    status,
+		Diff:       diff,
+		EventTime:  eventTime,
+		ClientDiff: clientDiff,
+		Status:     status,
 	}
 	
 	// Se todos apertaram, encerra imediatamente
@@ -245,7 +251,7 @@ func (c *Client) readPump() {
 			case "start":
 				c.game.handleStart(msg.LagComp)
 			case "press":
-				go c.game.handlePress(msg.Player, msg.Latency)
+				go c.game.handlePress(msg.Player, msg.Latency, msg.ClientTime)
 			}
 		}
 	}

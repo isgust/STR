@@ -40,10 +40,15 @@ body {
 
 /* START SCREEN */
 #start-screen {
-    justify-content: space-around;
+    justify-content: center;
+    gap: 20px;
     background: url('data:image/svg+xml;utf8,<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="%23ffffff22"/></svg>') repeat;
 }
 
+.title-container {
+    position: relative;
+    display: inline-block;
+}
 .title-container h1 {
     font-size: 3rem;
     margin: 10px 0;
@@ -52,7 +57,16 @@ body {
 }
 .title-container .bomber { color: #ff6600; font-size: 4rem;}
 .title-container .man { color: #ffcc00; font-size: 4rem;}
-.title-container .five { color: var(--green); font-size: 6rem; position: absolute; right: 10%; top: 20%; transform: skew(-15deg); text-shadow: 6px 6px 0px #000, 8px 8px 0px #fff;}
+.title-container .five { 
+    color: var(--green); 
+    font-size: 6rem; 
+    position: absolute; 
+    right: -60px; 
+    bottom: -10px; 
+    top: auto;
+    transform: skew(-15deg); 
+    text-shadow: 6px 6px 0px #000, 8px 8px 0px #fff;
+}
 
 .blinking {
     animation: blink 1s step-end infinite;
@@ -86,17 +100,17 @@ body {
 }
 
 .header {
-    margin-bottom: 20px;
-}
-
-#timer {
-    font-size: 3rem;
-    color: var(--highlight);
     margin-bottom: 10px;
 }
 
+#timer {
+    font-size: 2rem;
+    color: var(--highlight);
+    margin-bottom: 5px;
+}
+
 .status-bar {
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .arena {
@@ -108,15 +122,15 @@ body {
 }
 
 .bomb-container {
-    height: 150px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 40px;
+    margin-bottom: 15px;
 }
 
 .bomb {
-    font-size: 5rem;
+    font-size: 3rem;
     transition: transform 0.1s;
 }
 
@@ -125,7 +139,7 @@ body {
 }
 
 .bomb.exploded {
-    font-size: 8rem;
+    font-size: 4rem;
     animation: explode 0.5s ease-out forwards;
 }
 
@@ -136,7 +150,7 @@ body {
 }
 
 @keyframes explode {
-    0% { transform: scale(1); opacity: 1; content: "💥"; }
+    0% { transform: scale(1); opacity: 1; content: "[BOOM]"; }
     50% { transform: scale(2); opacity: 1; }
     100% { transform: scale(3); opacity: 0; }
 }
@@ -150,12 +164,12 @@ body {
 .player {
     background: rgba(0, 0, 0, 0.5);
     border: 4px solid #555;
-    padding: 20px;
+    padding: 10px;
     width: 30%;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 .player.p1 { border-color: #3399ff; }
@@ -163,11 +177,11 @@ body {
 .player.p3 { border-color: #33cc33; }
 
 .player .sprite {
-    font-size: 3rem;
+    font-size: 1.5rem;
 }
 
 .player .name {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 
 .player .ping {
@@ -211,16 +225,16 @@ body {
     margin-bottom: 15px;
 }
 #ranking-container {
-    margin-top: 30px;
+    margin-top: 15px;
     background: rgba(0,0,0,0.8);
     border: 2px solid var(--highlight);
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
 }
 #ranking-list {
-    margin: 20px 0;
-    font-size: 0.8rem;
-    line-height: 1.8;
+    margin: 10px 0;
+    font-size: 0.7rem;
+    line-height: 1.4;
     text-align: left;
 }
 .btn {

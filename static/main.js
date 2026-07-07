@@ -53,7 +53,7 @@ function updateGameState(data) {
 
     if (gameState === 'countdown') {
         bomb.className = 'bomb countdown';
-        bomb.innerText = '💣';
+        bomb.innerText = '[BOMB]';
         statusText.innerText = "GET READY!";
         statusText.style.color = "white";
         if (!renderTimer) {
@@ -61,7 +61,7 @@ function updateGameState(data) {
         }
     } else if (gameState === 'exploded') {
         bomb.className = 'bomb exploded';
-        bomb.innerText = '💥';
+        bomb.innerText = '[BOOM]';
         timerEl.innerText = "00:00";
         statusText.innerText = "BOOM!";
         statusText.style.color = "red";
@@ -131,20 +131,17 @@ function showResults(results, expTime) {
     let html = `<div style="margin-bottom: 10px; color: var(--highlight);">Objetivo: Apertar exatamente no 00:00.000!</div>`;
     
     validPlayers.forEach((p, index) => {
-        let sign = p.result.diff > 0 ? "+" : "";
+        let cSign = p.result.clientDiff > 0 ? "+" : "";
+        let sSign = p.result.diff > 0 ? "+" : "";
+        let clientText = `Apertou fisicamente no timer: ${cSign}${p.result.clientDiff}ms`;
+        let serverText = `Chegou no servidor: ${sSign}${p.result.diff}ms`;
+        let detailText = `<br><span style="font-size: 0.85em; opacity: 0.9; color: #aaa;">(${clientText} | ${serverText})</span>`;
         
         if (p.result.status === "DEAD") {
-            html += `<div style="color: red;">💀 ${p.name} - Clicou depois do zero (Atraso: ${sign}${p.result.diff}ms) -> EXPLODIU!</div>`;
+            html += `<div style="color: red; margin-bottom: 8px;">[X] ${p.name} - EXPLODIU!${detailText}</div>`;
         } else {
-            let medal = index === 0 ? "🥇" : (index === 1 ? "🥈" : "🥉");
-            
-            // diff é negativo se foi antes da explosão.
-            let timeLeft = -p.result.diff;
-            const seconds = Math.floor(timeLeft / 1000);
-            const ms = Math.floor(timeLeft % 1000);
-            const clickTimeStr = `0${seconds}:${ms.toString().padStart(3, '0')}`;
-
-            html += `<div style="color: var(--green);">${medal} ${p.name} - Clicou no timer: ${clickTimeStr} (Antecipou: ${timeLeft}ms) -> SOBREVIVEU!</div>`;
+            let medal = index === 0 ? "[1st]" : (index === 1 ? "[2nd]" : "[3rd]");
+            html += `<div style="color: var(--green); margin-bottom: 8px;">${medal} ${p.name} - SOBREVIVEU!${detailText}</div>`;
         }
     });
 
@@ -179,7 +176,7 @@ function updatePlayerResult(playerId, result) {
 function resetUI() {
     timerEl.innerText = "--:--";
     bomb.className = 'bomb idle';
-    bomb.innerText = '💣';
+    bomb.innerText = '[BOMB]';
     rankingContainer.style.display = 'none';
     [1, 2, 3].forEach(i => {
         const el = document.getElementById(`p${i}-result`);
